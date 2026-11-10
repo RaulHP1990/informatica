@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Tickets - Soporte Informático</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .container {
+    max-width: 620px;
+    width: 100%;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    padding: 30px;
+  }
+
+  h1 {
+    color: #fff;
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #c9d8f5;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+  }
+
+  h2 {
+    color: #1e3c72;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e8eef8;
+  }
+
+  .form-group { margin-bottom: 16px; }
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 6px;
+  }
+
+  label .req { color: #e74c3c; }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid #d5deea;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #fafbfd;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #2a5298;
+    box-shadow: 0 0 0 3px rgba(42,82,152,0.12);
+    background: #fff;
+  }
+
+  textarea { resize: vertical; min-height: 80px; }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 520px) {
+    .row { grid-template-columns: 1fr; }
+  }
+
+  .btn {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin-top: 8px;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(30,60,114,0.35);
+  }
+
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  /* ===== MENSAJES DE ESTADO ===== */
+  .status-box {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    display: none;
+    line-height: 1.6;
+  }
+
+  .status-box.show { display: block; }
+
+  .status-box.success { background: #e0f7e9; color: #1e8449; border-left: 4px solid #1e8449; }
+  .status-box.error { background: #ffe0e0; color: #c0392b; border-left: 4px solid #c0392b; }
+  .status-box.info { background: #e8f0ff; color: #1e3c72; border-left: 4px solid #2a5298; }
+
+  .status-box .item { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #2a5298;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🎫 Generador de Tickets</h1>
+  <p class="subtitle">Sistema de Soporte Informático — Mesa de Ayuda</p>
+
+  <!-- FORMULARIO -->
+  <div class="card">
+    <h2>📝 Nuevo Ticket</h2>
+    <form id="ticketForm">
+      <div class="row">
+        <div class="form-group">
+          <label>Nombre del solicitante <span class="req">*</span></label>
+          <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
+        </div>
+        <div class="form-group">
+          <label>Área / Departamento <span class="req">*</span></label>
+          <input type="text" id="area" placeholder="Ej: Contabilidad" required>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label>Correo electrónico <span class="req">*</span></label>
+          <input type="email" id="email" placeholder="usuario@empresa.com" required>
+        </div>
+        <div class="form-group">
+          <label>Teléfono / Extensión</label>
+          <input type="tel" id="telefono" placeholder="Ej: 1234">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label>Categoría <span class="req">*</span></label>
+          <select id="categoria" required>
+            <option value="">-- Seleccionar --</option>
+            <option>Hardware</option>
+            <option>Software</option>
+            <option>Red / Conectividad</option>
+            <option>Correo electrónico</option>
+            <option>Impresora</option>
+            <option>Acceso / Contraseñas</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Prioridad <span class="req">*</span></label>
+          <select id="prioridad" required>
+            <option value="Baja">🟢 Baja</option>
+            <option value="Media" selected>🟡 Media</option>
+            <option value="Alta">🔴 Alta</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Asunto <span class="req">*</span></label>
+        <input type="text" id="asunto" placeholder="Resumen breve del problema" required>
+      </div>
+
+      <div class="form-group">
+        <label>Descripción detallada <span class="req">*</span></label>
+        <textarea id="descripcion" placeholder="Describe el problema, equipo afectado, mensajes de error, etc." required></textarea>
+      </div>
+
+      <button type="submit" class="btn" id="btnGenerar">✅ Generar Ticket</button>
+    </form>
+
+    <div id="statusBox" class="status-box"></div>
+  </div>
+</div>
+
+<!-- SDK de EmailJS -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<script>
+/* ============================================================
+   ⚙️ CONFIGURACIÓN — REEMPLAZA ESTOS 4 VALORES
+   ============================================================ */
+const EMAILJS_SERVICE_ID  = "service_d3xvq6v";       // Ej: service_abc123
+const EMAILJS_TEMPLATE_ID = "template_fecuoxl";      // Ej: template_xyz789
+const EMAILJS_PUBLIC_KEY  = "CVPt7Q526nVQBtg5z";       // Ej: AbCdEfGhIjKlMnOp
+const SHEETS_WEB_APP_URL  = "https://script.google.com/macros/s/AKfycbwgtBOyLXZgoAFJEysyC7S-8jhL5whuk206VHfPC1VAn1fsME20chON4iN6RSLEqHnC9w/exec"; // Ej: https://script.google.com/macros/s/AKfy.../exec
+/* ============================================================ */
+
+// Inicializar EmailJS
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+/* ---------- Utilidades ---------- */
+function generarId() {
+  const fecha = new Date();
+  const y = fecha.getFullYear().toString().slice(-2);
+  const m = String(fecha.getMonth() + 1).padStart(2, '0');
+  const d = String(fecha.getDate()).padStart(2, '0');
+  const rand = Math.floor(1000 + Math.random() * 9000);
+  return `TCK-${y}${m}${d}-${rand}`;
+}
+
+function formatearFecha(fecha) {
+  return fecha.toLocaleString('es-ES', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+
+/* ---------- Mensajes de estado ---------- */
+function mostrarEstado(tipo, html) {
+  const box = document.getElementById('statusBox');
+  box.className = `status-box show ${tipo}`;
+  box.innerHTML = html;
+}
+
+/* ---------- Envío de correo ---------- */
+async function enviarCorreo(ticket) {
+  const params = {
+    ticket_id:  ticket.id,
+    fecha:      ticket.fecha,
+    nombre:     ticket.nombre,
+    area:       ticket.area,
+    email:      ticket.email,
+    telefono:   ticket.telefono,
+    categoria:  ticket.categoria,
+    prioridad:  ticket.prioridad,
+    asunto:     ticket.asunto,
+    descripcion:ticket.descripcion
+  };
+  return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params);
+}
+
+/* ---------- Envío a Google Sheets ---------- */
+async function enviarSheets(ticket) {
+  const data = {
+    ticket_id:  ticket.id,
+    fecha:      ticket.fecha,
+    nombre:     ticket.nombre,
+    area:       ticket.area,
+    email:      ticket.email,
+    telefono:   ticket.telefono,
+    categoria:  ticket.categoria,
+    prioridad:  ticket.prioridad,
+    asunto:     ticket.asunto,
+    descripcion:ticket.descripcion
+  };
+
+  // Usamos text/plain para evitar preflight CORS con Apps Script
+  await fetch(SHEETS_WEB_APP_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(data)
+  });
+  // Con no-cors no podemos leer la respuesta, pero si no lanza error, se envió
+  return true;
+}
+
+/* ---------- Submit del formulario ---------- */
+document.getElementById('ticketForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const btn = document.getElementById('btnGenerar');
+  btn.disabled = true;
+  btn.textContent = '⏳ Procesando...';
+
+  // 1. Recopilar datos
+  const ticket = {
+    id: generarId(),
+    fecha: formatearFecha(new Date()),
+    nombre: document.getElementById('nombre').value.trim(),
+    area: document.getElementById('area').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    telefono: document.getElementById('telefono').value.trim() || 'No especificado',
+    categoria: document.getElementById('categoria').value,
+    prioridad: document.getElementById('prioridad').value,
+    asunto: document.getElementById('asunto').value.trim(),
+    descripcion: document.getElementById('descripcion').value.trim()
+  };
+
+  // 2. Mostrar estado de envío
+  mostrarEstado('info', `
+    <div class="item"><span class="spinner"></span> Enviando notificación por correo...</div>
+    <div class="item"><span class="spinner"></span> Registrando en Google Sheets...</div>
+  `);
+
+  // 3. Enviar correo y registrar en Sheets en paralelo
+  let correoOk = false;
+  let sheetsOk = false;
+  let correoErr = '';
+  let sheetsErr = '';
+
+  await Promise.all([
+    enviarCorreo(ticket)
+      .then(() => { correoOk = true; })
+      .catch(err => { correoErr = err?.text || err?.message || String(err); }),
+    enviarSheets(ticket)
+      .then(() => { sheetsOk = true; })
+      .catch(err => { sheetsErr = err?.message || String(err); })
+  ]);
+
+  // 4. Mostrar resultado final
+  const lineas = [];
+  lineas.push(correoOk
+    ? '<div class="item">✅ Notificación por correo enviada</div>'
+    : `<div class="item">❌ Error al enviar correo: ${correoErr}</div>`);
+  lineas.push(sheetsOk
+    ? '<div class="item">✅ Registro guardado en Google Sheets</div>'
+    : `<div class="item">❌ Error al registrar en Sheets: ${sheetsErr}</div>`);
+
+  const todoOk = correoOk && sheetsOk;
+  mostrarEstado(todoOk ? 'success' : 'error',
+    `<strong>Ticket #${ticket.id} generado</strong><br>${lineas.join('')}`
+  );
+
+  // 5. Limpiar el formulario automáticamente
+  document.getElementById('ticketForm').reset();
+  // Restaurar prioridad por defecto (Media)
+  document.getElementById('prioridad').value = 'Media';
+
+  // 6. Restaurar botón
+  btn.disabled = false;
+  btn.textContent = '✅ Generar Ticket';
+});
+</script>
+</body>
+</html>
